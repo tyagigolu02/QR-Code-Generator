@@ -392,156 +392,130 @@ function generateQRCode() {
         let foregroundColor = customStyle === 'colors' ? fgColor.value : '#000000';
         let backgroundColor = customStyle === 'colors' ? bgColor.value : '#ffffff';
         
-        // Create QR code
-        const qr = new QRCode(qrContainer, {
+        // Create QR code with basic options
+        const qrCode = new QRCode(qrContainer, {
             text: qrText.value,
-            height: size,
-            width: size,
-            colorLight: backgroundColor,
+            width: parseInt(size),
+            height: parseInt(size),
             colorDark: foregroundColor,
-            correctLevel: QRCode.CorrectLevel.M
+            colorLight: backgroundColor,
+            correctLevel: QRCode.CorrectLevel.H
         });
-        
+
         // Wait for QR code to be generated, then apply customizations
         setTimeout(() => {
-            applyCustomizations();
+            const canvas = qrContainer.querySelector('canvas');
+            if (canvas) {
+                applyCustomizations(canvas);
+            }
+            
+            // Add success animation
+            qrContainer.classList.add('success-animation');
+            setTimeout(() => {
+                qrContainer.classList.remove('success-animation');
+            }, 600);
         }, 100);
-        
+
     } catch (error) {
         console.error("Error generating QR code:", error);
-        alert("Error generating QR code. Please try again.");
+        alert("Error generating QR code. Please check your input and try again.");
     }
 }
 
-function applyCustomizations() {
-    const canvas = qrContainer.querySelector('canvas');
-    if (!canvas) return;
-    
+function applyCustomizations(canvas) {
     const ctx = canvas.getContext('2d');
+    const canvasSize = parseInt(size);
     
-    // Apply rounded corners
-    if (customStyle === 'rounded') {
-        applyRoundedCorners(canvas, ctx);
+    // Apply customizations based on current style
+    switch(customStyle) {
+        case 'rounded':
+            applyRoundedCorners(ctx, canvasSize);
+            break;
+        case 'logo':
+            if (uploadedLogo) {
+                addLogoToCanvas(ctx, canvasSize);
+            }
+            break;
+        case 'emoji':
+            if (selectedEmoji) {
+                addEmojiToCanvas(ctx, canvasSize);
+            }
+            break;
+        case 'colors':
+            // Colors are already applied in QRCode creation
+            break;
+        case 'default':
+            // No additional customizations
+            break;
     }
-    
-    // Add logo or emoji overlay
-    if (customStyle === 'logo' && uploadedLogo) {
-        addLogoOverlay(canvas, ctx);
-    } else if (customStyle === 'emoji' && selectedEmoji) {
-        addEmojiOverlay(canvas, ctx);
-    }
-    
-    // Add size information
-    addSizeInfo();
-    
-    // Add animation
-    setTimeout(() => {
-        canvas.style.animation = 'zoomIn 0.5s ease-out';
-    }, 50);
 }
 
-function applyRoundedCorners(canvas, ctx) {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
+function applyRoundedCorners(ctx, canvasSize) {
     const radius = parseInt(cornerRadius.value);
+    const imageData = ctx.getImageData(0, 0, canvasSize, canvasSize);
     
-    // Create a temporary canvas for rounded effect
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
+    // Create a new canvas for rounded effect
+    const roundedCanvas = document.createElement('canvas');
+    roundedCanvas.width = canvasSize;
+    roundedCanvas.height = canvasSize;
+    const roundedCtx = roundedCanvas.getContext('2d');
     
-    // Draw rounded rectangle mask
-    tempCtx.beginPath();
-    tempCtx.roundRect(0, 0, canvas.width, canvas.height, radius);
-    tempCtx.clip();
+    // Create rounded rectangle mask
+    roundedCtx.beginPath();
+    roundedCtx.moveTo(radius, 0);
+    roundedCtx.lineTo(canvasSize - radius, 0);
+    roundedCtx.quadraticCurveTo(canvasSize, 0, canvasSize, radius);
+    roundedCtx.lineTo(canvasSize, canvasSize - radius);
+    roundedCtx.quadraticCurveTo(canvasSize, canvasSize, canvasSize - radius, canvasSize);
+    roundedCtx.lineTo(radius, canvasSize);
+    roundedCtx.quadraticCurveTo(0, canvasSize, 0, canvasSize - radius);
+    roundedCtx.lineTo(0, radius);
+    roundedCtx.quadraticCurveTo(0, 0, radius, 0);
+    roundedCtx.closePath();
+    roundedCtx.clip();
     
-    // Draw original image data
-    tempCtx.putImageData(imageData, 0, 0);
+    // Draw the original image
+    roundedCtx.putImageData(imageData, 0, 0);
     
     // Replace original canvas content
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(tempCanvas, 0, 0);
+    ctx.clearRect(0, 0, canvasSize, canvasSize);
+    ctx.drawImage(roundedCanvas, 0, 0);
 }
 
-function addLogoOverlay(canvas, ctx) {
-    if (!uploadedLogo) return;
-    
+function addLogoToCanvas(ctx, canvasSize) {
     const logoSizePercent = parseInt(logoSize.value);
-    const logoPixelSize = (canvas.width * logoSizePercent) / 100;
+    const logoPixelSize = (canvasSize * logoSizePercent) / 100;
+    const logoX = (canvasSize - logoPixelSize) / 2;
+    const logoY = (canvasSize - logoPixelSize) / 2;
     
-    // Calculate position (center)
-    const x = (canvas.width - logoPixelSize) / 2;
-    const y = (canvas.height - logoPixelSize) / 2;
-    
-    // Add white background circle for logo
+    // Create a white background for the logo
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, logoPixelSize / 2 + 5, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.fillRect(logoX - 5, logoY - 5, logoPixelSize + 10, logoPixelSize + 10);
     
-    // Draw logo
-    ctx.drawImage(uploadedLogo, x, y, logoPixelSize, logoPixelSize);
+    // Draw the logo
+    ctx.drawImage(uploadedLogo, logoX, logoY, logoPixelSize, logoPixelSize);
 }
 
-function addEmojiOverlay(canvas, ctx) {
-    if (!selectedEmoji) return;
-    
+function addEmojiToCanvas(ctx, canvasSize) {
     const emojiSizePercent = parseInt(emojiSize.value);
-    const emojiPixelSize = (canvas.width * emojiSizePercent) / 100;
+    const emojiFontSize = (canvasSize * emojiSizePercent) / 100;
+    const emojiX = canvasSize / 2;
+    const emojiY = canvasSize / 2;
     
-    // Add white background circle for emoji
+    // Create a white background for the emoji
+    const backgroundSize = emojiFontSize * 1.2;
     ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, emojiPixelSize / 2 + 5, 0, 2 * Math.PI);
-    ctx.fill();
+    ctx.fillRect(
+        emojiX - backgroundSize / 2,
+        emojiY - backgroundSize / 2,
+        backgroundSize,
+        backgroundSize
+    );
     
-    // Draw emoji
-    ctx.font = `${emojiPixelSize}px Arial`;
+    // Draw the emoji
+    ctx.font = `${emojiFontSize}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(selectedEmoji, canvas.width / 2, canvas.height / 2);
+    ctx.fillStyle = '#000000';
+    ctx.fillText(selectedEmoji, emojiX, emojiY);
 }
-
-function addSizeInfo() {
-    // Add size information with proper labels
-    const sizeInfo = document.createElement('div');
-    sizeInfo.className = 'qr-size-info';
-    let sizeLabel = '';
-    
-    switch(size) {
-        case '150':
-            sizeLabel = 'Small';
-            break;
-        case '250':
-            sizeLabel = 'Medium';
-            break;
-        case '350':
-            sizeLabel = 'Large';
-            break;
-        default:
-            sizeLabel = 'Custom';
-    }
-    
-    let styleLabel = customStyle === 'default' ? '' : ` - ${customStyle.charAt(0).toUpperCase() + customStyle.slice(1)} Style`;
-    sizeInfo.textContent = `${sizeLabel} QR Code - ${size}x${size}px${styleLabel}`;
-    qrContainer.appendChild(sizeInfo);
-}
-
-// Add roundRect polyfill for older browsers
-if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
-        this.beginPath();
-        this.moveTo(x + radius, y);
-        this.lineTo(x + width - radius, y);
-        this.quadraticCurveTo(x + width, y, x + width, y + radius);
-        this.lineTo(x + width, y + height - radius);
-        this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-        this.lineTo(x + radius, y + height);
-        this.quadraticCurveTo(x, y + height, x, y + height - radius);
-        this.lineTo(x, y + radius);
-        this.quadraticCurveTo(x, y, x + radius, y);
-        this.closePath();
-    };
-}
-

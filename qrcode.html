@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="qrcode.css">
+    <link rel="stylesheet" href="style.css">
     <title>QR Code Generator</title>
 </head>
 <body>
@@ -133,6 +133,23 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                
+                <div class="qr-display">
+                    <div class="qr-body">
+                        <div class="placeholder-content">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <path d="m5 5 2 2"/>
+                                <path d="m5 17 2-2"/>
+                                <path d="m19 5-2 2"/>
+                                <path d="m19 17-2-2"/>
+                            </svg>
+                            <p>Your QR code will appear here</p>
+                        </div>
+                    </div>
                     
                     <div class="action-buttons">
                         <button id="generateBtn" class="btn btn-primary">
@@ -154,28 +171,11 @@
                         </button>
                     </div>
                 </div>
-                
-                <div class="qr-display">
-                    <div class="qr-body">
-                        <div class="placeholder-content">
-                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="3" y="3" width="7" height="7"/>
-                                <rect x="14" y="3" width="7" height="7"/>
-                                <rect x="14" y="14" width="7" height="7"/>
-                                <path d="m5 5 2 2"/>
-                                <path d="m5 17 2-2"/>
-                                <path d="m19 5-2 2"/>
-                                <path d="m19 17-2-2"/>
-                            </svg>
-                            <p>Your QR code will appear here</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="qrcode.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
