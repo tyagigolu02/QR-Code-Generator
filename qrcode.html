@@ -8,34 +8,174 @@
     <title>QR Code Generator</title>
 </head>
 <body>
-    <div class="box">
-        <div class="qr-header">
-            <h1>Generate QR Code</h1>
-            <input type="text" placeholder="Type your text or URL" id="qr-text">
-            <div>
-            <label for="sizes">Select Size:</label>
-            <select id="sizes">
-                <option value="100">100x100</option>
-                <option value="200">200x200</option>
-                <option value="300">300x300</option>
-                <option value="400">400x400</option>
-                <option value="500">500x500</option>
-                <option value="600">600x600</option>
-                <option value="700">700x700</option>
-                <option value="800">800x800</option>
-                <option value="900">900x900</option>
-                <option value="1000">1000x1000</option>
-            </select>
+    <div class="background-animation">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+            <div class="shape shape-5"></div>
         </div>
-        </div>
-        <div class="qr-body"></div>
-        <div class="qr-footer">
-            <a href="" id="generateBtn">Generate</a>
-            <a href="" id="downloadBtn" download="QR_Code.png">Download</a>
+    </div>
+    
+    <div class="container">
+        <div class="main-card">
+            <div class="card-header">
+                <div class="icon-wrapper">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <path d="m5 5 2 2"/>
+                        <path d="m5 17 2-2"/>
+                        <path d="m19 5-2 2"/>
+                        <path d="m19 17-2-2"/>
+                    </svg>
+                </div>
+                <h1>QR Code Generator</h1>
+                <p>Create QR codes instantly for any text or URL</p>
+            </div>
+            
+            <div class="horizontal-layout">
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="qr-text">Enter your content</label>
+                        <input type="text" placeholder="Type your text or URL here..." id="qr-text">
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="sizes">Select Size</label>
+                            <select id="sizes">
+                                <option value="150">Small (150x150)</option>
+                                <option value="250" selected>Medium (250x250)</option>
+                                <option value="350">Large (350x350)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="format">Download Format</label>
+                            <select id="format">
+                                <option value="png">PNG (Recommended)</option>
+                                <option value="jpg">JPG</option>
+                                <option value="jpeg">JPEG</option>
+                                <option value="webp">WebP</option>
+                                <option value="svg">SVG</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="customization">QR Code Style</label>
+                        <select id="customization">
+                            <option value="default">Default</option>
+                            <option value="logo">Add Logo/Image</option>
+                            <option value="emoji">Add Emoji</option>
+                            <option value="colors">Custom Colors</option>
+                            <option value="rounded">Rounded Style</option>
+                        </select>
+                    </div>
+
+                    <!-- Custom Options Container -->
+                    <div id="custom-options" class="custom-options" style="display: none;">
+                        <!-- Logo Upload -->
+                        <div class="custom-option" id="logo-option" style="display: none;">
+                            <label for="logo-upload">Upload Logo/Image</label>
+                            <input type="file" id="logo-upload" accept="image/*" class="file-input">
+                            <div class="file-preview" id="logo-preview"></div>
+                            <div class="logo-controls">
+                                <label for="logo-size">Logo Size:</label>
+                                <input type="range" id="logo-size" min="15" max="35" value="25">
+                                <span id="logo-size-value">25%</span>
+                            </div>
+                        </div>
+
+                        <!-- Emoji Option -->
+                        <div class="custom-option" id="emoji-option" style="display: none;">
+                            <label for="emoji-select">Select Emoji</label>
+                            <div class="emoji-grid">
+                                <button type="button" class="emoji-btn" data-emoji="😀">😀</button>
+                                <button type="button" class="emoji-btn" data-emoji="🚀">🚀</button>
+                                <button type="button" class="emoji-btn" data-emoji="❤️">❤️</button>
+                                <button type="button" class="emoji-btn" data-emoji="⭐">⭐</button>
+                                <button type="button" class="emoji-btn" data-emoji="🔥">🔥</button>
+                                <button type="button" class="emoji-btn" data-emoji="💎">💎</button>
+                                <button type="button" class="emoji-btn" data-emoji="🎯">🎯</button>
+                                <button type="button" class="emoji-btn" data-emoji="🌟">🌟</button>
+                            </div>
+                            <div class="emoji-controls">
+                                <label for="emoji-size">Emoji Size:</label>
+                                <input type="range" id="emoji-size" min="15" max="35" value="25">
+                                <span id="emoji-size-value">25%</span>
+                            </div>
+                        </div>
+
+                        <!-- Color Options -->
+                        <div class="custom-option" id="color-option" style="display: none;">
+                            <div class="color-controls">
+                                <div class="color-group">
+                                    <label for="fg-color">QR Code Color:</label>
+                                    <input type="color" id="fg-color" value="#000000">
+                                </div>
+                                <div class="color-group">
+                                    <label for="bg-color">Background Color:</label>
+                                    <input type="color" id="bg-color" value="#ffffff">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rounded Style -->
+                        <div class="custom-option" id="rounded-option" style="display: none;">
+                            <div class="rounded-controls">
+                                <label for="corner-radius">Corner Radius:</label>
+                                <input type="range" id="corner-radius" min="0" max="10" value="3">
+                                <span id="corner-radius-value">3px</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="generateBtn" class="btn btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                                <path d="M3 3v5h5"/>
+                                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                                <path d="M21 21v-5h-5"/>
+                            </svg>
+                            Generate QR Code
+                        </button>
+                        <button id="downloadBtn" class="btn btn-secondary" download="QR_Code.png">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download QR Code
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="qr-display">
+                    <div class="qr-body">
+                        <div class="placeholder-content">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                                <path d="m5 5 2 2"/>
+                                <path d="m5 17 2-2"/>
+                                <path d="m19 5-2 2"/>
+                                <path d="m19 17-2-2"/>
+                            </svg>
+                            <p>Your QR code will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="qrcode.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="qrcode.js"></script>
 </body>
 </html>
